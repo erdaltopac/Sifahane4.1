@@ -1,0 +1,12 @@
+ŞİFAHANE v4.0 KURULUM
+
+1. Kaynak ZIP'ini ayıklayın ve Android Studio ile proje kökünü açın.
+2. JDK 17 ve Android SDK 35 bileşenlerinin kurulu olduğunu doğrulayın.
+3. Gradle Sync sonrası test, lint, debug/release ve Android test APK derlemelerini çalıştırın.
+4. Oluşturulan debug APK'yı mevcut Şifahane'yi kaldırmadan güncelleme olarak kurun.
+5. Temiz kurulumda ilk yönetici kullanıcısının bilgilerini, yönetici şifresini ve desenini zorunlu kurulum ekranında oluşturun.
+6. Ayarlar > Android İzinleri bölümünde bildirim, kesin alarm, tam ekran alarm, pil optimizasyonu ve kamera durumlarını doğrulayın.
+7. İlk şifreli .sifbak yedeğini ve uygulama içi geri yükleme noktasını oluşturun; parolayı güvenli saklayın.
+8. docs/RELEASE_CHECKLIST.md, docs/ALARM_TEST_MATRIX.md ve docs/ANDROID_12_16_CIHAZ_MATRISI.md maddelerini uygulayın.
+
+Mevcut uygulamayı kaldırmayın. Kaldırma işlemi uygulama verilerini, özel dosyaları ve Android Keystore anahtarlarını silebilir.

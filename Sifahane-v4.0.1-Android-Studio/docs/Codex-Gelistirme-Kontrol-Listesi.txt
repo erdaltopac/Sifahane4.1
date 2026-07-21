@@ -1,0 +1,278 @@
+UYGULANABİLİR TEKNİK PLAN
+Şifahane v3.4.0
+Codex Tarafından Gerçekleştirilebilir Geliştirme Kontrol Listesi
+Yalnız kaynak kodu, proje yapılandırması, otomatik testler ve teknik dokümantasyon üzerinde uygulanabilen maddeler
+Kapsam sahibi
+OpenAI Codex
+Çalışma alanı
+Şifahane Android Studio projesi
+Hariç tutulanlar
+Nihai hukuk/klinik onayı, Play Console işlemi, üretim anahtarı ve zorunlu fiziksel saha kabulü
+Tamamlanma kanıtı
+Kod farkı + otomatik test/build raporu + değişiklik notu
+1. Kapsam ve Sınırlar
+Bu listedeki tüm maddeler Codex tarafından doğrudan proje üzerinde uygulanabilir. Bazı Android davranışları için cihaz matrisi hazırlanabilir ve emülatör/erişilebilir cihazlarda test yapılabilir; üreticiye özgü nihai saha kabulü bu teknik listenin dışında ayrıca raporlanır.
+• Hukuki veya klinik metin taslakları hazırlanabilir; fakat uzman onayı bu listede tamamlanmış sayılmaz.
+• Mağaza yayını ve üretim imzası için paket hazırlanabilir; hesap sahibi işlemi bu listenin dışındadır.
+• Her madde bağımsız küçük değişiklikler, test ve derleme doğrulamasıyla uygulanmalıdır; büyük tek seferlik yeniden yazım yapılmamalıdır.
+2. Gerçekleştirilebilir Geliştirme Maddeleri
+A. Güvenlik, Gizlilik ve KVKK
+☐ A01 · KRİTİK — Room veritabanını cihazda şifrele.
+Kabul ölçütü: Yeni ve mevcut kurulumlarda sağlık verisi düz SQLite olarak okunamaz; yükseltme veri kaybı olmadan tamamlanır; anahtar Android Keystore ile korunur.
+☐ A02 · KRİTİK — Yedek dosyalarını AES-GCM ile şifrele ve kimlik doğrulamalı bütünlük koruması ekle.
+Kabul ölçütü: Yanlış parola veya tek bayt değişiklik güvenli biçimde reddedilir; açık JSON/fotoğraf ZIP içinde görünmez; eski yedekler kontrollü geçişle desteklenir.
+☐ A03 · KRİTİK — Kod içine gömülü 12345 yönetici PIN’ini kaldır.
+Kabul ölçütü: İlk açılışta kullanıcı kendisi PIN oluşturur; hiçbir varsayılan veya arka kapı PIN kabul edilmez.
+☐ A04 · KRİTİK — PIN ve desen saklamada rastgele salt ve yavaş KDF kullan.
+Kabul ölçütü: Her kullanıcı için benzersiz salt vardır; PBKDF2/Argon2id/scrypt parametreleri belgelenir; eski hash ilk başarılı girişte yükseltilir.
+☐ A05 · KRİTİK — Yönetici PIN’ine artan bekleme süresi ve deneme sınırı ekle.
+Kabul ölçütü: Başarısız denemeler kalıcı olarak sayılır; yeniden başlatma sınırı aşmaz; başarılı giriş sayacı sıfırlar; kullanıcı kilit süresini görür.
+☐ A06 · YÜKSEK — Android BiometricPrompt ve cihaz kimlik bilgisiyle güvenli giriş ekle.
+Kabul ölçütü: Biyometri yalnız kullanıcı onayıyla açılır; iptal/hata/fallback akışları çalışır; biyometri PIN’in güvenli kurtarma rolünü zayıflatmaz.
+☐ A07 · KRİTİK — Android otomatik yedekleme politikasını sağlık verisine göre sınırla.
+Kabul ölçütü: allowBackup kapalıdır veya dataExtractionRules veritabanı, tercih, fotoğraf ve anahtarları hariç tutar; adb/cloud senaryosu test edilir.
+☐ A08 · YÜKSEK — Hassas ekranlarda ekran görüntüsü ve son uygulamalar önizlemesi politikasını uygula.
+Kabul ölçütü: PIN, profil, ilaç, ölçüm ve rapor ekranlarında yapılandırılmış gizlilik davranışı vardır; alarm ekranının kullanılabilirliği ayrıca test edilir.
+☐ A09 · YÜKSEK — Dışa aktarma ve paylaşım öncesi açık sağlık verisi uyarısı göster.
+Kabul ölçütü: Kullanıcı dosyanın içeriğini, hedefini ve şifreli olup olmadığını görmeden paylaşım başlamaz.
+☐ A12 · YÜKSEK — Gizli bilgi ve bağımlılık güvenlik taraması ekle.
+Kabul ölçütü: CI; anahtar, parola, sertifika ve bilinen zafiyet taramalarında kritik bulgu varsa sürümü durdurur.
+B. Mimari ve Kod Sürdürülebilirliği
+☐ B01 · KRİTİK — 8.000+ satırlık MainActivity.kt dosyasını özellik bazlı ekranlara böl.
+Kabul ölçütü: Bugün, İlaçlar, Profiller, Ölçümler, Raporlar, Ayarlar ve Yedekleme ayrı dosya/paketlerdedir; MainActivity yalnız uygulama kabuğunu yönetir.
+☐ B02 · YÜKSEK — Navigation Compose NavHost ve tip güvenli rotalara geç.
+Kabul ölçütü: Geri tuşu, predictive back, deep-link ve ekran geçmişi tutarlı çalışır; enum tabanlı elle gezinme kaldırılır.
+☐ B03 · YÜKSEK — Her ana özellik için ViewModel ve tek yönlü UI durumu oluştur.
+Kabul ölçütü: Composable’lar DAO çağırmaz; yükleniyor/başarılı/hata durumları ViewModel üzerinden gözlenir; iş mantığı birim test edilebilir.
+☐ B04 · YÜKSEK — Repository ve use-case sınırlarını tanımla.
+Kabul ölçütü: Veritabanı, alarm, dosya ve dışa aktarma ayrıntıları UI’dan ayrılmıştır; bağımlılıklar constructor üzerinden verilir.
+☐ B05 · YÜKSEK — Form durumlarını SavedStateHandle/rememberSaveable ile koru.
+Kabul ölçütü: Ekran dönüşü ve süreç yeniden oluşturma sonrasında ilaç, randevu, profil ve ölçüm taslakları kaybolmaz; iptal davranışı nettir.
+☐ B06 · ORTA — Domain sabitlerini enum/sealed type/value object yapılarına taşı.
+Kabul ölçütü: Rol, izin, doz eylemi, randevu durumu, ölçüm tipi ve tema seçeneklerinde serbest metin karşılaştırması kalmaz.
+☐ B07 · ORTA — Tarih ve saat modelini tekleştir.
+Kabul ölçütü: Yerel tarih metinleri yerine uygun java.time türleri kullanılır; saat dilimi ve yaz/kış saati dönüşümleri test edilir.
+☐ B08 · ORTA — Bağımlılık sürümlerini version catalog üzerinden yönet.
+Kabul ölçütü: Tek kaynaklı libs.versions.toml bulunur; yinelenen sürüm tanımı yoktur; güncelleme etkisi raporlanır.
+☐ B09 · ORTA — Gradle wrapper ve standart geliştirme komutlarını projeye ekle.
+Kabul ölçütü: Temiz makinede ./gradlew ile test, lint ve build çalışır; makineye özel Gradle yolu gerekmez.
+☐ B10 · ORTA — Kaynak paketini Git temelli sürümleme ve temiz .gitignore ile düzenle.
+Kabul ölçütü: build, .gradle, IDE ve geçici dosyalar sürüm kontrolüne girmez; her sürüm etiketlenebilir ve yeniden üretilebilir.
+C. Veri Modeli, Migrasyon ve Yedekleme
+☐ C01 · YÜKSEK — Room şema dışa aktarımını etkinleştir.
+Kabul ölçütü: Her DB sürümünün JSON şeması sürüm kontrolündedir; şema farkı kod incelemesinde görülebilir.
+☐ C02 · YÜKSEK — Tüm Room migrasyonları için MigrationTestHelper testleri yaz.
+Kabul ölçütü: Desteklenen her eski sürüm v10 ve yeni sürüme veri kaybı olmadan yükselir; indeks ve varsayılan değerler doğrulanır.
+☐ C03 · YÜKSEK — profileId, medicationId ve reportGroupId ilişkilerine foreign key ekle.
+Kabul ölçütü: Yetim kayıt oluşmaz; silme davranışı açıkça RESTRICT/CASCADE/SET NULL olarak tanımlıdır ve testlidir.
+☐ C04 · YÜKSEK — Sık sorgulanan alanlara indeks ekle.
+Kabul ölçütü: profileId, medicationId, scheduledDateTime, measuredAt, active/status ve reportGroupId sorguları için sorgu planı doğrulanır.
+☐ C05 · YÜKSEK — Yedek içe aktarmaya toplam boyut, girdi sayısı ve sıkıştırma oranı sınırı ekle.
+Kabul ölçütü: Zip bomb, çok sayıda dosya ve 100 MB’lık çoklu girdi bellek taşmasına yol açmadan reddedilir.
+☐ C06 · YÜKSEK — Yedek medyasını belleğe toplamak yerine akış halinde işle.
+Kabul ölçütü: Büyük fotoğraflı yedekte tepe bellek kabul sınırındadır; yarım import atomik olarak geri alınır ve geçici dosyalar temizlenir.
+☐ C07 · YÜKSEK — Yedek formatı v1-v3 ve gelecek sürüm uyumluluk testleri yaz.
+Kabul ölçütü: Geçerli eski örnekler açılır; bozuk checksum, eksik kayıt, bilinmeyen sürüm ve kötü yol güvenli hata verir.
+☐ C08 · ORTA — Birleştirerek içe aktarmada kopya kayıt politikasını belirle.
+Kabul ölçütü: Aynı ilaç, ölçüm ve doz kaydı için kullanıcıya önizleme ve birleştir/atla seçenekleri sunulur; sonuç özeti gösterilir.
+☐ C09 · ORTA — Silme işlemlerine geri alınabilirlik veya açık iki aşamalı onay ekle.
+Kabul ölçütü: Profil/ilaç/ölçüm silme yanlış dokunmayla gerçekleşmez; hangi verilerin etkileneceği gösterilir.
+☐ C10 · ORTA — Fotoğraf yaşam döngüsü ve gereksiz dosya temizliği oluştur.
+Kabul ölçütü: Silinen/değiştirilen kayıtların sahipsiz fotoğrafları güvenle temizlenir; etkin dosyalar yanlışlıkla silinmez.
+☐ C11 · ORTA — Ölçüm ve doz alanlarına domain doğrulaması ekle.
+Kabul ölçütü: Fizyolojik olmayan tansiyon, nabız, glikoz, negatif stok ve geçersiz tarih/saat değerleri kaydedilmez; hata açıklayıcıdır.
+D. Alarm ve Bildirim Güvenilirliği
+☐ D01 · KRİTİK — Tekli, grup, deneme ve randevu alarmlarını ortak yaşam döngüsüyle yönet.
+Kabul ölçütü: Aynı olay için tek ses, tek bildirim ve tek aktif ekran oluşur; kimlik çakışması yoktur.
+☐ D02 · KRİTİK — Ertelemede eski bildirim, ses, titreşim ve PendingIntent’i kesin kapat.
+Kabul ölçütü: Her erteleme tam bir yeni alarm üretir; eski bildirime dokunmak bitmiş alarmı açmaz; paralel zincir oluşmaz.
+☐ D03 · YÜKSEK — Ekran açık/kapalı, kilitli/kilitsiz ve ön/arka plan matrisini doğrula.
+Kabul ölçütü: Tekli ve grup alarmı her desteklenen durumda tanımlı davranışı gösterir; sessiz bildirime düşme belgelenir veya giderilir.
+☐ D04 · YÜKSEK — Exact alarm yetki akışını koru ve regresyon testi ekle.
+Kabul ölçütü: canScheduleExactAlarms kontrolü, ayara yönlendirme ve fallback davranışı Android 12–16’da doğrulanır.
+☐ D05 · YÜKSEK — Tam ekran bildirim yetkisi ve OEM kısıtlarını kullanıcıya anlaşılır göster.
+Kabul ölçütü: Yetki yokken uygulama yanıltıcı başarı göstermez; doğru sistem ekranına yönlendirir ve dönüşte durumu yeniler.
+☐ D06 · YÜKSEK — Boot, uygulama güncelleme, saat/tarih ve zaman dilimi değişikliklerinde yeniden planlamayı test et.
+Kabul ölçütü: Alarm sayısı değişmez, mükerrer alarm oluşmaz ve geçmiş doz politikası tutarlı uygulanır.
+☐ D07 · YÜKSEK — Deneme alarmına gerçek erteleme seçeneklerini ekle.
+Kabul ölçütü: Ayar süreleri kullanılır; gerçek ilaç, stok, doz geçmişi ve raporlar değişmez; yalnız bir kez yeniden tetiklenir.
+☐ D08 · ORTA — Önceden kalmış Şifahane alarm isteklerini temizleme aracı ekle.
+Kabul ölçütü: Yalnız uygulamaya ait istekler temizlenir; kullanıcı önizleme/onay görür; ardından geçerli alarmlar yeniden kurulur.
+☐ D09 · ORTA — Kişisel veri içermeyen alarm tanılama ekranı oluştur.
+Kabul ölçütü: Son/sonraki alarm, erteleme, izinler ve aktif servis durumu gösterilir; tanılama güvenle kopyalanabilir.
+☐ D10 · ORTA — Alarm ses kaynağını yaşam döngüsü güvenli tekil bir bileşene taşı.
+Kabul ölçütü: Activity yeniden yaratılması, bildirim dokunuşu veya grup dozu ikinci MediaPlayer/servis başlatmaz.
+☐ D11 · ORTA — Alarm ekranındaki kullanım dışı pencere ve bildirim API’lerini güncelle.
+Kabul ölçütü: Derleme uyarıları giderilir; kilit ekranı, ekran açma ve öncelik davranışı desteklenen API’lerle korunur.
+E. Gezinme ve Temel Kullanıcı Deneyimi
+☐ E01 · YÜKSEK — Alt navigasyona Bugün, İlaçlar, Randevular ve Ölçümler’i yerleştir.
+Kabul ölçütü: En sık kullanılan ekranlar tek dokunuşla açılır; merkezi ekleme düğmesi net görev seçimi sunar; Ayarlar/Profiller ikincil menüdedir.
+☐ E02 · YÜKSEK — Bugün ekranını saat sıralı birleşik ilaç ve randevu zaman çizelgesine dönüştür.
+Kabul ölçütü: Yaklaşan, alınan, kaçırılan ve ertelenen öğeler metin+ikon+renkle ayrılır; ekran okuyucu sırası kronolojiktir.
+☐ E03 · YÜKSEK — Doz onayını büyük, tek görevli ve geri alınabilir tasarla.
+Kabul ölçütü: Alındı/almadım/ertele seçenekleri açık; onay sonrası kısa süreli Geri Al vardır; yanlışlıkla stok değişimi düzeltilebilir.
+☐ E04 · YÜKSEK — Yeni kişi, ilaç, randevu ve ölçüm formlarında güvenli iptal ekle.
+Kabul ölçütü: Değişiklik varsa çıkış uyarısı gösterilir; iptal yarım kayıt bırakmaz; sistem geri hareketi aynı politikayı uygular.
+☐ E05 · YÜKSEK — Randevuların mevcut Gelecek/Geçmiş ayrımını ortak kart sistemiyle iyileştir.
+Kabul ölçütü: Doktor, kurum, bölüm, tarih-saat ve konum saniyeler içinde taranabilir; geçmiş kayıtlar görsel olarak ikincildir.
+☐ E06 · ORTA — İlaç kartlarında adı, dozu, saati ve durumu önceliklendir.
+Kabul ölçütü: Kart ilk bakışta dört temel bilgiyi gösterir; ayrıntılar ikincil ekrandadır; ilaç formu ikonu fotoğrafı destekler fakat yerine geçmez.
+☐ E07 · ORTA — Ortak yükleniyor, hata, boş durum ve başarı bileşenleri oluştur.
+Kabul ölçütü: Her liste aynı geri bildirim dilini kullanır; boş durumda sonraki açık eylem gösterilir; yalnız renk kullanılmaz.
+☐ E08 · ORTA — Bildirim merkezi tasarla.
+Kabul ölçütü: Alındı, kaçırıldı, yaklaşan randevu, düşük stok ve rapor uyarıları filtrelenebilir; tümünü okundu işaretle erişilebilirdir.
+☐ E09 · ORTA — İlaç uyum istatistiklerini yargılayıcı olmayan dille sun.
+Kabul ölçütü: “Başarı” yerine planlanan/alınan/kaçırılan doz sayıları ve hesap yöntemi gösterilir; eksik veri yanlış oran üretmez.
+☐ E10 · ORTA — Barkod tarama sonrasında güvenilir otomatik doldurma akışı tasarla.
+Kabul ölçütü: ML Kit yalnız kodu okur; ilaç adı/doz/prospektüs bilgisi yalnız doğrulanmış kaynaktan gelir ve kullanıcı kaydetmeden önce onaylar.
+☐ E11 · ORTA — Saat seçimini erişilebilir Material zaman seçiciyle iyileştir.
+Kabul ölçütü: Klavye, TalkBack ve büyük yazıda çalışır; yalnız estetik wheel picker’a bağımlı değildir; 12/24 saat ayarına uyar.
+☐ E12 · ORTA — Acil durum özelliği için yanlış dokunma ve doğrulama tasarla.
+Kabul ölçütü: Aranacak kişi ve eylem önceden doğrulanır; yanlış alarm riski azaltılır; çevrimdışı davranış açıktır.
+F. Tema, Görsel Sistem ve Marka
+☐ F01 · YÜKSEK — Açık, standart koyu ve OLED saf siyah tema oluştur.
+Kabul ölçütü: Alarm dahil tüm ekranlar üç temada okunur; sistem tercihi ve kullanıcı seçimi desteklenir; yeniden açılışta korunur.
+☐ F02 · YÜKSEK — Material 3 renk rollerini semantik olarak tamamla.
+Kabul ölçütü: primary/container/surface/error/outline rolleri sabit ekran renklerinin yerini alır; kritik durum anlamları temalar arasında değişmez.
+☐ F03 · ORTA — Dynamic Color’ı isteğe bağlı seçenek yap.
+Kabul ölçütü: Android 12+ cihazlarda açılıp kapanabilir; kapalıyken Şifahane kurumsal paleti korunur; kontrast testi her iki modda geçer.
+☐ F04 · YÜKSEK — Leonardo tasarımındaki Vantablack-turkuaz dili Şifahane markasına uyarlanarak yeniden üret.
+Kabul ölçütü: MediTakip adı/ikonu veya üçüncü taraf görünümü kopyalanmaz; Şifahane logosu, Türkçe içerik ve erişilebilir ölçüler kullanılır.
+☐ F05 · ORTA — Kartları tek ince tema kenarlığı ve ölçülü yükseltiyle sadeleştir.
+Kabul ölçütü: Üst üste üç kenarlık/gölge katmanı yoktur; seçili, uyarı ve hata durumları semantik varyantlarla ayrılır.
+☐ F06 · ORTA — colors.xml ve Kotlin tema kaynaklarını tek tasarım token sisteminde birleştir.
+Kabul ölçütü: Kullanılmayan renkler temizlenir; sabit Vantablack/turkuaz kullanımları rol veya belgeli marka tokenına bağlanır.
+☐ F07 · ORTA — Tema adlarını kullanıcı odaklı hale getir.
+Kabul ölçütü: Sakin, Canlı, Yüksek Kontrast gibi adlar önizlemeyle gösterilir; “Türk kırmızısı” gibi bağlam dışı teknik adlar açıklanır veya kaldırılır.
+☐ F08 · ORTA — Material Symbols outlined ikonlarını kullan ve çift çizim yöntemini kaldır.
+Kabul ölçütü: İkonlar tek kez çizilir, bulanıklık yoktur; seçili/pasif durumlar tutarlı; RTL yönlü ikonlar AutoMirrored kullanır.
+☐ F09 · ORTA — Banner ve alt menüyü tek erişilebilir bileşen olarak sadeleştir.
+Kabul ölçütü: Beyaz hat, sıçrama ve farklı logo ölçekleri yoktur; hareket azaltma tercihine uyar; reklam benzeri dikkat dağıtma oluşturmaz.
+☐ F10 · DÜŞÜK — Hazerfen banner animasyonunu yaşam döngüsü ve performans açısından sınırla.
+Kabul ölçütü: Aynı anda tek animasyon çalışır; arka planda durur; sekme değişiminde gereksiz yeniden başlamaz; bağlantı açıklamalıdır.
+G. Erişilebilirlik ve Kapsayıcı Tasarım
+☐ G01 · KRİTİK — Tüm etkileşimli bileşenlerde en az 48×48 dp dokunma alanı sağla.
+Kabul ölçütü: Görsel ikon küçük kalabilse de semantik dokunma alanı 48 dp’den az değildir; yaşlı kullanıcı cihaz testinde doğrulanır.
+☐ G02 · YÜKSEK — TalkBack açıklamalarını ve semantik rolleri tamamla.
+Kabul ölçütü: Etkileşimli hiçbir ikon anlamsız/null değildir; dekoratif öğeler bilinçli gizlenir; durum ve değerler konuşulur.
+☐ G03 · YÜKSEK — Sistem yazı ölçeğini kısıtlamadan destekle.
+Kabul ölçütü: %200 ve üzeri yazıda temel akışlar kullanılabilir; metin kırpılmaz/üst üste binmez; özel 0.85–1.35 sınırı sistem erişilebilirliğini bozmaz.
+☐ G04 · YÜKSEK — Renk kontrastını otomatik ve cihaz üstünde doğrula.
+Kabul ölçütü: Normal/büyük metin, ikon ve durum bileşenleri açık/koyu/OLED/dynamic temalarda hedef kontrastı karşılar.
+☐ G05 · YÜKSEK — Durumu yalnız renk ile anlatma.
+Kabul ölçütü: Alındı, kaçırıldı, uyarı, seçili ve hata durumlarında metin veya ayırt edici ikon da vardır.
+☐ G06 · ORTA — Atkinson Hyperlegible, Lexend ve diğer fontları Türkçe karakterlerle doğrula.
+Kabul ölçütü: Ğ, İ, ı, Ş, ş ve uzun metinler tüm ağırlık/boyutlarda doğru görünür; eksik glyph veya satır kırpılması yoktur.
+☐ G07 · ORTA — Animasyonları azalt sistem tercihine uy.
+Kabul ölçütü: Dekoratif banner, parlayan onay ve geçişler azaltılır/kapatılır; kritik geri bildirim statik olarak da anlaşılır.
+☐ G08 · ORTA — Klavye, Switch Access ve ekran büyütme senaryolarını test et.
+Kabul ölçütü: Odak sırası mantıklıdır; formlar yalnız dokunmayla kullanılmaya bağımlı değildir; büyütmede temel kontroller kaybolmaz.
+☐ G09 · ORTA — Tüm kullanıcı metinlerini strings.xml kaynaklarına taşı.
+Kabul ölçütü: Kotlin içinde kullanıcıya görünen sabit metin kalmaz; yerelleştirme ve çoğul kuralları uygulanabilir.
+☐ G10 · ORTA — Hata mesajlarını eyleme dönük ve sade hale getir.
+Kabul ölçütü: Teknik istisna kullanıcıya gösterilmez; sorun, veri etkisi ve sonraki adım açıklanır.
+H. Performans ve Kaynak Kullanımı
+☐ H01 · YÜKSEK — Apache POI bağımlılığını ve Excel gereksinimini ölç.
+Kabul ölçütü: APK/AAB boyut analizi yapılır; CSV veya daha hafif XLSX çözümü kabul ölçütlerini karşılıyorsa POI kaldırılır.
+☐ H02 · YÜKSEK — Release AAB boyutu ve yöntem sayısı için bütçe belirle.
+Kabul ölçütü: Her CI çalışmasında boyut raporlanır; beklenmeyen artış eşik aşımında inceleme gerektirir.
+☐ H03 · ORTA — Compose yeniden çizimlerini ve büyük listeleri profille.
+Kabul ölçütü: Bugün, ilaçlar, raporlar ve banner ekranlarında gereksiz recomposition azaltılır; LazyColumn anahtarları kararlıdır.
+☐ H04 · ORTA — Dosya, JSON, ZIP ve XLSX işlemlerini uygun dispatcher’da çalıştır.
+Kabul ölçütü: StrictMode ve cihaz profillemesinde ana iş parçacığında disk/ağ/ağır hesaplama görülmez; ilerleme ve iptal desteklenir.
+☐ H05 · ORTA — Başlangıç süresi ve ilk kullanılabilir ekranı ölç.
+Kabul ölçütü: Soğuk/ılık başlangıç hedefleri tanımlıdır; gereksiz veritabanı ve medya işi açılışı geciktirmez.
+☐ H06 · ORTA — Fotoğraf çözünürlüğü ve cache politikasını sınırla.
+Kabul ölçütü: Çok büyük fotoğraflar yeniden boyutlandırılır; OOM oluşmaz; EXIF yönü ve gizlilik metadatası ele alınır.
+☐ H07 · DÜŞÜK — Hareketli banner’ın enerji ve GPU maliyetini ölç.
+Kabul ölçütü: Uzun süre açık ekranda kabul edilebilir frame time ve güç tüketimi sağlar; başarısızsa statik marka alanına dönülür.
+I. Test, CI ve Kalite Güvence
+☐ I01 · KRİTİK — Mevcut ClassNotFoundException veren birim test altyapısını düzelt.
+Kabul ölçütü: AppPreferencesTest ve AlarmGroupingTest temiz checkout üzerinde gerçekten çalışır; raporlanan test sayısı kaynakla eşleşir.
+☐ I02 · KRİTİK — Doz alma, stok düşme ve Geri Al için kapsamlı birim testleri yaz.
+Kabul ölçütü: Stok sıfırın altına düşmez; tekrarlı dokunuş idempotenttir; legacy stockDecreased=null davranışı belirgindir.
+☐ I03 · KRİTİK — Alarm gruplama, erteleme ve yeniden planlama testleri yaz.
+Kabul ölçütü: Aynı saat tek alarm grubudur; DST/saat dilimi/yeniden başlatma/izin yok senaryoları beklenen sonucu verir.
+☐ I04 · YÜKSEK — Yedek oluşturma, doğrulama ve geri yükleme test seti oluştur.
+Kabul ölçütü: Şifreli/şifresiz eski format, bozuk veri, yanlış parola, zip-slip ve zip-bomb örnekleri kapsanır.
+☐ I05 · YÜKSEK — Room DAO, transaction ve migrasyon testlerini ekle.
+Kabul ölçütü: Silme ilişkileri, indeksler, atomik stok/log işlemleri ve tüm migrasyon yolları cihaz/emülatör üzerinde geçer.
+☐ I06 · YÜKSEK — Compose UI testleriyle temel kullanıcı yolculuklarını kapsa.
+Kabul ölçütü: İlk kurulum, profil, ilaç ekleme, barkod, doz onayı, randevu, ölçüm, yedek ve ayarlar otomatik test edilir.
+☐ I07 · YÜKSEK — Erişilebilirlik otomasyonunu CI’a ekle.
+Kabul ölçütü: Eksik açıklama, küçük dokunma hedefi ve temel kontrast sorunları raporlanır; kritik sorun sürümü engeller.
+☐ I08 · YÜKSEK — Android 12–16 cihaz matrisi oluştur.
+Kabul ölçütü: En az bir düşük bellekli cihaz, Samsung/Xiaomi benzeri OEM, gesture/3-button navigation ve farklı font ölçekleri kapsanır.
+☐ I09 · YÜKSEK — CI kalite kapısı kur.
+Kabul ölçütü: Birim test, androidTest, lint, assembleRelease, bağımlılık taraması ve belge/şema kontrollerinden biri başarısızsa paket yayımlanmaz.
+☐ I10 · ORTA — Kod biçimlendirme ve statik analiz ekle.
+Kabul ölçütü: ktlint/detekt kuralları belgeli; yeni kritik code smell, karmaşıklık veya coroutine ihlali engellenir.
+☐ I11 · ORTA — Görsel regresyon/screenshot testleri ekle.
+Kabul ölçütü: Açık, koyu, OLED, büyük yazı ve temel ekran boyutlarında kritik ekranlar referansla karşılaştırılır.
+☐ I12 · ORTA — Manuel alarm test matrisi ve imzalı kanıt kaydı oluştur.
+Kabul ölçütü: Ekran/uygulama/telefon durumları, izin kombinasyonları ve sonuçlar cihaz-sürüm bilgisiyle kaydedilir.
+J. Sağlık Güvenliği ve İçerik Kalitesi
+☐ J01 · KRİTİK — Uygulamanın tıbbi kapsamını ve sınırlarını açıkça belirt.
+Kabul ölçütü: Tanı/tedavi yerine geçmediği, acil durumda kullanılmaması gereken bölümler ve sorumluluk sınırı görünürdür.
+☐ J02 · KRİTİK — İlaç ve ölçüm verisi için tehlikeli otomatik önerilerden kaçın.
+Kabul ölçütü: Uygulama doz değişikliği veya klinik karar önermez; barkod/prospektüs verisi kullanıcı ve güvenilir kaynak doğrulaması olmadan kaydedilmez.
+☐ J03 · YÜKSEK — Ölçüm birimlerini ve referans bağlamını açık göster.
+Kabul ölçütü: mg/dL, mmHg, nabız ve ölçüm tipi her kayıtta görünür; birim dönüşümü varsa kayıp/yuvarlama testlidir.
+☐ J04 · YÜKSEK — Kaçırılan doz ve düşük stok mesajlarını güvenli dille tasarla.
+Kabul ölçütü: Kullanıcıya çift doz alma gibi tıbbi yönlendirme yapılmaz; gerekiyorsa hekim/eczacıya danışma önerilir.
+☐ J06 · ORTA — İlaç uyumu metriklerinin hesabını şeffaflaştır.
+Kabul ölçütü: Plan dışı, ertelenmiş, bilinmeyen ve eski kayıtların paydaya etkisi belgelenir; kullanıcı hatalı suçluluk mesajı görmez.
+K. Dağıtım, Operasyon ve Dokümantasyon
+☐ K02 · YÜKSEK — Reproducible release akışı ve sürüm numaralama standardı oluştur.
+Kabul ölçütü: Etiketli commit aynı AAB/APK’yı üretir; versionCode otomatik ve tekdüzedir; BUILD_TIME deterministikliği bozuyorsa düzenlenir.
+☐ K04 · YÜKSEK — Kullanıcı kılavuzu ve uygulama içi yardım metnini güncelle.
+Kabul ölçütü: Yeni güvenlik, yedek parola, biyometri, izin, navigasyon ve tema davranışları ekran görüntülü olarak açıklanır.
+☐ K05 · ORTA — Değişiklik günlüğünü tek kaynağa indir.
+Kabul ölçütü: Her sürüm için tekrar eden onlarca README yerine sürüm notu/changelog ve arşiv politikası vardır.
+☐ K07 · ORTA — Destek için kişisel veri içermeyen tanılama paketi oluştur.
+Kabul ölçütü: Sürüm, cihaz, izin ve alarm durumu bulunur; ad, ilaç, ölçüm, doktor ve dosya yolu bulunmaz.
+☐ K08 · ORTA — Açık kaynak lisans bildirimini uygulama içinde sun.
+Kabul ölçütü: Font, ML Kit, CameraX, Room, POI/alternatif ve diğer lisanslar erişilebilir bir ekranda listelenir.
+X. Codex Teknik Tamamlama Kapıları
+☐ X01 · BLOKAJ — Kaynak kod güvenlik kapısını tamamla.
+Kabul ölçütü: Şifreli DB/yedek, güvenli PIN/desen, backup politikası ve paylaşım uyarıları kod + otomatik test kanıtıyla tamamlanır.
+☐ X02 · BLOKAJ — Temiz proje kalite kapısını tamamla.
+Kabul ölçütü: Gradle wrapper ile unit test, lint, debug/release derleme ve statik analiz erişilebilir ortamda başarılıdır; raporlar teslim edilir.
+☐ X03 · BLOKAJ — Veri bütünlüğü otomasyonunu tamamla.
+Kabul ölçütü: Tüm migrasyon, DAO transaction, stok/doz ve yedek round-trip testleri geçer.
+☐ X04 · BLOKAJ — Alarm mantığı otomasyonunu tamamla.
+Kabul ölçütü: Gruplama, kimlik, erteleme, yeniden planlama, saat dilimi ve izin fallback testleri geçer; manuel cihaz matrisi ayrıca hazırlanır.
+☐ X05 · BLOKAJ — Erişilebilirlik statik/UI kapısını tamamla.
+Kabul ölçütü: Semantik açıklama, 48 dp hedef, büyük yazı düzeni ve tema kontrastı otomatik denetim/screenshot testlerinde kritik hata içermez.
+☐ X06 · BLOKAJ — Teknik teslim paketini oluştur.
+Kabul ölçütü: Kaynak ZIP, oluşturulabilen APK/AAB, SHA-256, değişiklik listesi, test raporu ve dış doğrulama gerektiren kalan işler açıkça teslim edilir.
+3. Uygulama Paketleri
+Paket
+Amaç
+Madde kapsamı
+Paket 1
+Güvenlik ve veri koruma
+A01–A09, A12, C01–C07
+Paket 2
+Test altyapısı ve alarm güvenilirliği
+D01–D11, I01–I05
+Paket 3
+Mimari ayrıştırma
+B01–B10
+Paket 4
+Erişilebilir UI/UX dönüşümü
+E01–E12, F01–F10, G01–G10
+Paket 5
+Performans ve teslimat otomasyonu
+H01–H07, I06–I12, K02, K04–K05, K07–K08
+Paket 6
+Teknik kabul ve teslim
+X01–X06
+4. Teslim Edilecek Kanıtlar
+☐ Değiştirilen dosyaların özeti ve önemli tasarım kararları.
+☐ Birim test, UI test, lint ve derleme sonuçları.
+☐ Room şema/migrasyon ve yedek uyumluluk kanıtları.
+☐ Alarm test matrisi ile dış fiziksel cihaz doğrulaması için kalan maddeler.
+☐ Erişilebilirlik, tema ve screenshot test raporları.
+☐ Kaynak paket, oluşturulabilen APK/AAB ve SHA-256 özetleri.
+Toplam teknik madde: 109. Bu sayı dış onay veya yetki gerektiren maddeler çıkarıldıktan sonra hesaplanmıştır.

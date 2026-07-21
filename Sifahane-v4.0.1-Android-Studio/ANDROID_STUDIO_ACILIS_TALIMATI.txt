@@ -1,0 +1,19 @@
+ŞİFAHANE v4.0 PROJESİNİ AÇMA VE DOĞRULAMA
+
+1) Sifahane-v4.0-Android-Studio.zip dosyasını tamamen çıkartın.
+2) Android Studio > Open ile ZIP içindeki proje kökünü açın.
+3) Gradle JDK olarak JDK 17, Android SDK olarak API 35 seçin.
+4) Gradle Sync tamamlandıktan sonra proje terminalinde çalıştırın:
+   Windows: gradlew.bat testDebugUnitTest lintDebug assembleDebug
+   Windows: gradlew.bat assembleRelease assembleDebugAndroidTest
+   macOS/Linux: ./gradlew testDebugUnitTest lintDebug assembleDebug assembleRelease assembleDebugAndroidTest
+5) Uygun emülatör/cihazda connectedDebugAndroidTest çalıştırın.
+6) docs/RELEASE_CHECKLIST.md ve docs/ANDROID_12_16_CIHAZ_MATRISI.md ile cihaz kabulini kaydedin.
+7) Mevcut veriyi koruma testi için APK'yı uygulamayı kaldırmadan güncelleme olarak kurun.
+
+ÖNEMLİ
+- Uygulamayı kaldırmak yerel verileri ve Android Keystore anahtarlarını silebilir.
+- Temiz kurulumda ilk yönetici kullanıcısı bilgi girişi, kullanıcı tarafından belirlenen yönetici şifresi ve zorunlu desenle oluşturulur; varsayılan PIN yoktur.
+- İlk veritabanı açılışı düz veriyi SQLCipher/Room v11 yapısına dönüştürebilir. İşlem sırasında uygulamayı zorla kapatmayın.
+- Yeni yedek uzantısı .sifbak'tır. Parola uygulamada tutulmaz; kaybedilirse yedek açılamaz.
+- Bu teslim ortamında Gradle dağıtımı indirilemediğinden APK üretilmemiştir; test-results/ANDROID_BUILD_ATTEMPT.txt dosyasına bakın.

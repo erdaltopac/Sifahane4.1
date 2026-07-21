@@ -1,0 +1,20 @@
+ŞİFAHANE v4.0 — YEREL KAYNAK DOĞRULAMA
+Tarih: 2026-07-21
+
+GEÇTİ
+- Room v3–v11 şema anlık görüntüleri
+- Room 10→11 SQLite migrasyon simülasyonu
+- Erişilebilirlik statik sözleşmeleri
+- Kotlin kaynak/mimari boyut kuralları
+- v4.0 işlevsel kabul kaynak sözleşmeleri
+- Release belge ve 109 madde matrisi bütünlüğü
+- Saf Kotlin: ilk kurulum, PBKDF2, artan kilit, alarm gruplama/zaman/tekilleştirme, doz idempotensi, sağlık alanı sınırları, AES-GCM, yanlış parola/bozulma, zip-slip/zip-bomb ve OOXML/XLSX
+- git diff --check
+
+ANDROID DERLEMESİ
+- testDebugUnitTest, lintDebug, assembleDebug ve assembleRelease komutları denendi.
+- Bu konteyner downloads.gradle.org alanına erişemediği için Gradle 8.9 indirilemedi.
+- Ayrıntı: test-results/ANDROID_BUILD_ATTEMPT.txt
+
+SONUÇ
+Kaynak kalite kapısı geçti. Android SDK/emülatör/fiziksel cihaz kabulü docs/RELEASE_CHECKLIST.md ve docs/Sifahane-v4.0-Kalan-Dis-Dogrulamalar.md uyarınca dış ortamda tamamlanmalıdır.

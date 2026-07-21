@@ -1,0 +1,17 @@
+ROOM_SCHEMA_SNAPSHOTS_OK
+MIGRATION_10_11_SQLITE_OK
+ACCESSIBILITY_STATIC_CHECK_OK
+KOTLIN_STATIC_ANALYSIS_OK
+FUNCTIONAL_ACCEPTANCE_CHECK_OK
+RELEASE_DOCUMENTATION_CHECK_OK
+PURE_KOTLIN_QUALITY_GATE_OK
++ /opt/pyvenv/bin/python tools/validate_schemas.py
++ /opt/pyvenv/bin/python tools/validate_migration_v11.py
++ /opt/pyvenv/bin/python tools/accessibility_static_check.py
++ /opt/pyvenv/bin/python tools/kotlin_static_analysis.py
++ /opt/pyvenv/bin/python tools/functional_acceptance_check.py
++ /opt/pyvenv/bin/python tools/release_documentation_check.py
++ kotlinc app/src/main/java/com/hazerfen/sifahane/security/FirstRunSecurityPolicy.kt app/src/main/java/com/hazerfen/sifahane/alarm/AlarmDeliveryPolicy.kt app/src/main/java/com/hazerfen/sifahane/alarm/MedicationAlarmKind.kt app/src/main/java/com/hazerfen/sifahane/alarm/AlarmGroupingPolicy.kt app/src/main/java/com/hazerfen/sifahane/alarm/AlarmTimePolicy.kt app/src/main/java/com/hazerfen/sifahane/data/DomainTypes.kt app/src/main/java/com/hazerfen/sifahane/data/DoseActionPolicy.kt app/src/main/java/com/hazerfen/sifahane/validation/HealthDataValidator.kt app/src/main/java/com/hazerfen/sifahane/backup/BackupArchivePolicy.kt app/src/main/java/com/hazerfen/sifahane/backup/BackupCipherCore.kt app/src/main/java/com/hazerfen/sifahane/backup/BackupValidationException.kt app/src/main/java/com/hazerfen/sifahane/export/SimpleXlsxWriter.kt tools/PureQualityGate.kt -include-runtime -d /tmp/sifahane-quality-hpd9r5e3/quality.jar
++ java -jar /tmp/sifahane-quality-hpd9r5e3/quality.jar
+GIT_DIFF_CHECK_SKIPPED_NO_REPOSITORY
+SOURCE_QUALITY_GATE_OK
